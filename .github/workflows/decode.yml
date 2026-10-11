@@ -1,0 +1,20 @@
+name: decode-images
+on:
+  push:
+    paths: ['b64/**']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  decode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p images
+          for f in b64/*.b64; do n=$(basename "$f" .b64); base64 -d "$f" > "images/$n"; done
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add images
+          git commit -m "Decode images" || echo nothing
+          git push
